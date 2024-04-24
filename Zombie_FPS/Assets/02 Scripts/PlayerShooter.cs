@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class PlayerShooter : MonoBehaviour
+public class PlayerShooter : MonoBehaviourPun
 {
     public Gun gun;
 
@@ -27,6 +28,11 @@ public class PlayerShooter : MonoBehaviour
 
     void Update()
     {
+        if(!photonView.IsMine)
+        {
+            return;
+        }
+
         if(playerInput.fire)
         {
             gun.Fire();

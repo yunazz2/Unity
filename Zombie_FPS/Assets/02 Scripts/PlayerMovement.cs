@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 // 플레이어가 받은 입력에 따라 이동 및 회전을 실행할 스크립트
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviourPun
 {
     private PlayerInput playerInput;
     private Rigidbody playerRigidbody;
@@ -22,6 +23,11 @@ public class PlayerMovement : MonoBehaviour
     // 물리 갱신 주기에 맞춰서 실행하는 업데이트
     void FixedUpdate()
     {
+        if(!photonView.IsMine)
+        {
+            return;
+        }
+
         Rotate();
         Move();
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 // 플레이어 생명체로서의 동작을 담당하는 스크립트
 public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으로 그 안의 MonoBehaviour도 상속 받게되기 때문에 기존 내용은 지움
@@ -39,6 +40,7 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
         playerShooter.enabled = true;
     }
 
+    [PunRPC]
     // 체력 회복 메소드
     public override void RestoreHealth(float newHealth)
     {
@@ -47,6 +49,7 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
         healthSlider.value = health;
     }
 
+    [PunRPC]
     // 데미지를 받았을 때
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal)
     {
@@ -72,6 +75,9 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
 
         playerMovement.enabled = false;
         playerShooter.enabled = false;
+
+        // Invoke : n초 뒤에 해당 메소드 함수를 실행시킬 거다.
+        Invoke("Respawn", 5.0f);
     }
 
     // 아이템과 충돌했을 때
@@ -83,9 +89,28 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
 
             if(item != null )
             {
-                item.Use(gameObject);
-                playerAudioPlayer.PlayOneShot(itemPickupClip);
+                if(PhotonNetwork.IsMasterClient)
+                {
+                    item.Use(gameObject);
+                    playerAudioPlayer.PlayOneShot(itemPickupClip);
+
+                }
             }
         }
+    }
+
+    // 플레이어 리스폰 함수
+    public void Respawn()
+    {
+        if(photonView.IsMine)
+        {
+            Vector3 randomSpawnPos = Random.insideUnitSphere * 5.0f;
+            randomSpawnPos.y = 0.0f;
+
+            transform.position = randomSpawnPos;
+        }
+
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
     }
 }
