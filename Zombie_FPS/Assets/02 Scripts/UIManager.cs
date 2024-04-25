@@ -59,6 +59,8 @@ public class UIManager : MonoBehaviour
     public void GameRestart()
     {
         Debug.Log("게임 재시작~");
+        SceneManager.LoadScene(2);  // 빈 씬 로드
+        Debug.Log("현재 연결 상태: " + PhotonNetwork.NetworkClientState);
         SceneManager.LoadScene(1);
     }
 }
