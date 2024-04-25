@@ -41,7 +41,6 @@ public class GameManager : MonoBehaviour
 
             UIManager.Instance().UpdateScoreText(score);
         }
-        
     }
 
     public void EndGame()

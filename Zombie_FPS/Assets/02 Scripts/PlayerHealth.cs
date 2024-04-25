@@ -93,7 +93,6 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
                 {
                     item.Use(gameObject);
                     playerAudioPlayer.PlayOneShot(itemPickupClip);
-
                 }
             }
         }
