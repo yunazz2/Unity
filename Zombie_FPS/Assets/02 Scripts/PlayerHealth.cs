@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using UnityEngine.Rendering.PostProcessing;
+using Unity.VisualScripting;
 
 // 플레이어 생명체로서의 동작을 담당하는 스크립트
 public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으로 그 안의 MonoBehaviour도 상속 받게되기 때문에 기존 내용은 지움
@@ -76,8 +78,12 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
         playerMovement.enabled = false;
         playerShooter.enabled = false;
 
+        Debug.Log("플레이어 사망 ㅠㅡㅠ");
+
+        GameManager.Instance().EndGame();
+
         // Invoke : n초 뒤에 해당 메소드 함수를 실행시킬 거다.
-        Invoke("Respawn", 5.0f);
+        //Invoke("Respawn", 5.0f);
     }
 
     // 아이템과 충돌했을 때
@@ -87,7 +93,7 @@ public class PlayerHealth : LivingEntity    // LivingEntity를 상속 받으면 자동으
         {
             IItem item = other.GetComponent<IItem>();
 
-            if(item != null )
+            if(item != null)
             {
                 if(PhotonNetwork.IsMasterClient)
                 {

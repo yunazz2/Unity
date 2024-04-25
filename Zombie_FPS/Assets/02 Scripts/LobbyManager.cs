@@ -80,5 +80,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks   // 포톤 서버 이용할 때는
     {
         connectionInfoText.text = "방 참가 성공~!";
         PhotonNetwork.LoadLevel("01 Main");
+        Debug.Log("게임 시작쓰~");
     }
 }

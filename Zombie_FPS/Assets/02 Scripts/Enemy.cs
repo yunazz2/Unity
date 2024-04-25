@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Photon.Pun;
 
 public class Enemy : LivingEntity
 {
@@ -45,16 +46,27 @@ public class Enemy : LivingEntity
 
     void Start()
     {
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         // 시작하자마자 좀비가 경로를 탐색할 수 있도록 코루틴 함수 실행
         StartCoroutine(UpdatePath());
     }
 
     void Update()
     {
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         // 프레임 단위로 좀비가 타겟을 찾는 애니메이션이 실행되도록
         enemyAnimator.SetBool("HasTarget", hasTarget);
     }
 
+    [PunRPC]
     // 좀비 AI 초기 능력치를 결정하는 함수
     public void SetUp(float newHealth, float newDamage, float newSpeed, Color skinColor)
     {
@@ -103,6 +115,7 @@ public class Enemy : LivingEntity
         }
     }
 
+    [PunRPC]
     // 데미지를 받았을 때
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal)
     {
@@ -140,6 +153,11 @@ public class Enemy : LivingEntity
     // 좀비가 플레이어에게 피해를 줄 때(Stay로 하는 이유는 좀비 손이 플에이어에게 닿는 동안 계속 데미지를 받아야하니까)
     private void OnTriggerStay(Collider other)
     {
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         if(!dead && Time.time >= lastAttackTime + timeBetAttack)    // 좀비 본인이 죽지 않은 상태이고, 마지막 공격 시간 + 공격 시간 간격이 지금 시간을 넘었다면(?)
         {
             LivingEntity attackTarget = other.GetComponent<LivingEntity>();

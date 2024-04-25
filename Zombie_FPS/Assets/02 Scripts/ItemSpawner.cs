@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Photon.Pun;
 
-public class ItemSpawner : MonoBehaviour
+public class ItemSpawner : MonoBehaviourPun
 {
     public GameObject[] items;              // 아이템 게임 오브젝트들을 저장할 배열
     public Transform playerTransform;       // 플레이어의 위치
@@ -26,6 +27,11 @@ public class ItemSpawner : MonoBehaviour
 
     void Update()
     {
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+
         // 주기적으로 아이템 생성 처리
         // 현재 시점이 아이템 마지막 생성 시점에서 생성 주기 이상 지났다면 && 플레이어가 존재한다면
         if(Time.time >= lastSpawnTime + timeBetSpawn && !GameManager.Instance().isGameOver)
@@ -41,17 +47,32 @@ public class ItemSpawner : MonoBehaviour
     public void Spawn()
     {
         // 플레이어 근처에서 내비메쉬 위의 랜덤 위치 가져오기
-        Vector3 spawnPosition = GetRandomPointOnNavMesh(playerTransform.position, maxDistance);
-        
+        //Vector3 spawnPosition = GetRandomPointOnNavMesh(playerTransform.position, maxDistance); // 이렇게 그냥 두면 마스터 주변에만 아이템이 생성되니까
+        Vector3 spawnPosition = GetRandomPointOnNavMesh(Vector3.zero, maxDistance);   // 불합리한 상황을 막으려고 vector3로 변경
+
         // 바닥에서 아이템을 0.5만큼 띄우기
         spawnPosition += Vector3.up * 0.5f;
 
         // 아이템 중 랜덤으로 하나 생성
         GameObject selectItem = items[Random.Range(0, items.Length)];
-        GameObject item = Instantiate(selectItem, spawnPosition, Quaternion.identity);
+        //GameObject item = Instantiate(selectItem, spawnPosition, Quaternion.identity);
+        GameObject item = PhotonNetwork.Instantiate(selectItem.name, spawnPosition, Quaternion.identity);
 
         // 생성된 아이템 5초 뒤에 파괴하기
-        Destroy(item, 5.0f);
+        //Destroy(item, 5.0f);
+        StartCoroutine(DestroyAfter(item, 5.0f));
+    }
+
+    // 코루틴 함수
+    // PhotonNetwork.Destroy 함수는 딜레이 값을 넣을 수 없어서 직접 Destroy 함수를 만들어서 사용
+    IEnumerator DestroyAfter(GameObject target, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if(target != null)
+        {
+            PhotonNetwork.Destroy(target);
+        }
     }
 
     // 내비메쉬 위의 랜덤한 위치를 반환하는 함수

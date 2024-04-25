@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 public class UIManager : MonoBehaviour
 {
@@ -57,6 +58,7 @@ public class UIManager : MonoBehaviour
     // 게임 재시작
     public void GameRestart()
     {
-        SceneManager.LoadScene(0);
+        Debug.Log("게임 재시작~");
+        SceneManager.LoadScene(1);
     }
 }
