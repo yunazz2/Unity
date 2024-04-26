@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public int score = 0;
     public bool isGameOver = false;
+
+    public string selectedButton = null;
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -36,9 +39,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     void Awake()
     {
         if(instance == null)
-        {
             instance = this;
-        }
     }
  
     private void Start()
@@ -84,32 +85,44 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // 로비로 나가기
     public void BackToLobby()
     {
+        selectedButton = EventSystem.current.currentSelectedGameObject.name;
+
         Debug.Log("로비로 나가기!");
-        PhotonNetwork.LeaveRoom();
+        Debug.Log("-----------------------");
+        PhotonNetwork.LeaveRoom();  // 방 나가기
     }
 
     // 게임 재시작
     public void GameRestart()
     {
-        Debug.Log("게임 재시작~");
+        selectedButton = EventSystem.current.currentSelectedGameObject.name;
 
-        PhotonNetwork.LeaveRoom();
-        StartCoroutine(DelayedInvoke()); // 코루틴을 통해 지연 실행
+        Debug.Log("게임 재시작!");
+        Debug.Log("-----------------------");
+        PhotonNetwork.LeaveRoom();  // 방 나가기
     }
 
-    IEnumerator DelayedInvoke()
+    // 코루틴
+    IEnumerator RestartGameCoroutine1()
     {
-        yield return new WaitForSecondsRealtime(3.0f);
-     
-        Debug.Log("들어오니?");
-        SceneManager.LoadScene("02 Loading");
-        Debug.Log("현재 연결 상태: " + PhotonNetwork.NetworkClientState);
-        SceneManager.LoadScene("01 Main");
+        yield return new WaitForSeconds(3.0f);
+        
+        Debug.Log("현재 연결 상태 : " + PhotonNetwork.NetworkClientState);
     }
 
-    // 방을 나갈 때 자동으로 실행되는 함수
+    // LeaveRoom()시 자동으로 실행되는 함수
     public override void OnLeftRoom()
     {
-        SceneManager.LoadScene("00 Lobby");
+        if (selectedButton.Equals("RestartButton"))
+        {
+            Debug.Log("게임 재시작 버튼이 눌렸습니다.");
+            
+            SceneManager.LoadScene("02 Loading");
+        }
+        else
+        {
+            Debug.Log("로비로 나가기 버튼이 눌렸습니다.");
+            SceneManager.LoadScene("00 Lobby");
+        }
     }
 }

@@ -12,7 +12,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks   // 포톤 서버 이용할 때는
 
     public Text connectionInfoText;
     public Button joinButton;
-
     void Start()
     {
         // 무조건 아래 두 개를 써야 포톤 사용이 가능하다.
@@ -69,7 +68,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks   // 포톤 서버 이용할 때는
     // 랜덤 룸 참가에 실패한 경우 자동 실행될 함수
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        connectionInfoText.text = "빈 방이 없어요ㅜㅡㅜ, 새로운 방을 생성합니다!";
+        connectionInfoText.text = "빈 방이 없어요ㅜㅡㅜ 새로운 방을 생성합니다!";
 
         // 최대 4명까지 수용 가능한 빈 방 생성
         PhotonNetwork.CreateRoom(null, new RoomOptions {MaxPlayers = 4});
@@ -78,9 +77,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks   // 포톤 서버 이용할 때는
     // 룸에 참가 완료된 경우 자동 실행될 함수
     public override void OnJoinedRoom()
     {
-        connectionInfoText.text = "방 참가 성공~!";
+        connectionInfoText.text = "방 참가 성공!";
         PhotonNetwork.LoadLevel("01 Main");
-        Debug.Log("게임 시작쓰~");
+        Debug.Log("게임 시작!");
+        Debug.Log("-----------------------");
     }
 
     // 게임 종료
