@@ -98,10 +98,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     IEnumerator DelayedInvoke()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(3.0f);
      
-        SceneManager.LoadScene(2);  // ºó ¾À ·Îµå
         Debug.Log("µé¾î¿À´Ï?");
+        SceneManager.LoadScene(2);  // ºó ¾À ·Îµå
         Debug.Log("ÇöÀç ¿¬°á »óÅÂ: " + PhotonNetwork.NetworkClientState);
         SceneManager.LoadScene(1);
     }
