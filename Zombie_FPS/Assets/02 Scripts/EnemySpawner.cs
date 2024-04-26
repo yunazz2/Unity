@@ -65,7 +65,6 @@ public class EnemySpawner : MonoBehaviourPun, IPunObservable
 
             if(!GameManager.Instance().isGameOver && enemies.Count <= 0)
             {
-                Debug.Log("다음 단계로~!");
                 SpawnWave();
             }
         }

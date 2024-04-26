@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    // 점수 갱신 함수
+    // 점수 갱신
     public void AddScore(int newScore)
     {
         // 점수 추가하고 ui 갱신
@@ -74,17 +74,36 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    // 게임 오버 처리
     public void EndGame()
     {
-        // 게임 오버 처리
         isGameOver = true;
         UIManager.Instance().SetActiveGameOverUI(true);
     }
 
+    // 로비로 나가기
     public void BackToLobby()
     {
         Debug.Log("로비로 나가기!");
         PhotonNetwork.LeaveRoom();
+    }
+
+    // 게임 재시작
+    public void GameRestart()
+    {
+        Debug.Log("게임 재시작~");
+
+        StartCoroutine(DelayedInvoke()); // 코루틴을 통해 지연 실행
+    }
+
+    IEnumerator DelayedInvoke()
+    {
+        yield return new WaitForSeconds(0.5f);
+     
+        SceneManager.LoadScene(2);  // 빈 씬 로드
+        Debug.Log("들어오니?");
+        Debug.Log("현재 연결 상태: " + PhotonNetwork.NetworkClientState);
+        SceneManager.LoadScene(1);
     }
 
     // 방을 나갈 때 자동으로 실행되는 함수
