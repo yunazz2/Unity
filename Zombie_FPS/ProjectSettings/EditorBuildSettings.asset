@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/01 Scenes/01 Main.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/01 Scenes/02 Empty Scene.unity
+    path: Assets/01 Scenes/02 Loading.unity
     guid: a587fd4c85e20824a90cd5525fe09b81
   m_configObjects: {}

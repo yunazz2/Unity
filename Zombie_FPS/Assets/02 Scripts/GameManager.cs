@@ -93,6 +93,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         Debug.Log("게임 재시작~");
 
+        PhotonNetwork.LeaveRoom();
         StartCoroutine(DelayedInvoke()); // 코루틴을 통해 지연 실행
     }
 
@@ -101,9 +102,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         yield return new WaitForSecondsRealtime(3.0f);
      
         Debug.Log("들어오니?");
-        SceneManager.LoadScene(2);  // 빈 씬 로드
+        SceneManager.LoadScene("02 Loading");
         Debug.Log("현재 연결 상태: " + PhotonNetwork.NetworkClientState);
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene("01 Main");
     }
 
     // 방을 나갈 때 자동으로 실행되는 함수
