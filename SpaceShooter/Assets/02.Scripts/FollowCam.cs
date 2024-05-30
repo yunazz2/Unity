@@ -55,3 +55,4 @@ public class FollowCam : MonoBehaviour
         camTr.LookAt(targetTr.position + (targetTr.up * targetOffset));
     }
 }
+
