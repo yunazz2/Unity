@@ -32,9 +32,28 @@ public class MonsterCtrl : MonoBehaviour
     private readonly int hashHit = Animator.StringToHash("Hit");
     private readonly int hashPlayerDie = Animator.StringToHash("PlayerDie");
     private readonly int hashSpeed = Animator.StringToHash("Speed");
+    private readonly int hashDie = Animator.StringToHash("Die");
 
     // 혈흔 효과 프리팹
     private GameObject bloodEffect;
+
+    // 몬스터 생명 변수
+    public int hp = 100;
+
+    // 스크립트가 활성화될 때마다 호출되는 함수
+    private void OnEnable()
+    {
+        // 이벤트 발생 시 수행할 함수 연결
+        PlayerCtrl.OnPlayerDie += this.OnPlayerDie;
+    }
+
+    // 스크립트가 비활성화될 때마다 호출되는 함수
+    private void OnDisable()
+    {
+        // 기존에 연결된 함수 해제
+        PlayerCtrl.OnPlayerDie -= this.OnPlayerDie;
+    }
+
 
     void Start()
     {
@@ -53,15 +72,13 @@ public class MonsterCtrl : MonoBehaviour
         // BloodSprayEffect 프리팹 로드
         bloodEffect = Resources.Load<GameObject>("BloodSprayEffect");
 
-        // 추적 대상의 위치를 설정하면 바로 추적 시작
-        //agent.destination = playerTr.position;
-
         // 몬스터의 상태를 체크하는 코루틴 함수 호출
         StartCoroutine(CheckMonsterState());
 
         // 몬스터의 상태에 따라 행동을 수행하는 코루틴 함수 호출
         StartCoroutine(MonsterAction());
     }
+
 
     // 0.3초마다 플레이어와 몬스터 사이의 거리를 체크하여 몬스터의 상태를 업데이트하는 코루틴 함수
     // - Update() 함수 내에 작성해도 무방하지만, 매 프레임마다 실행하는 것은 성능상 문제가 생길 수 있으므로 코루틴 함수로 처리한다.
@@ -72,6 +89,9 @@ public class MonsterCtrl : MonoBehaviour
         {
             // 0.3초 동안 중지(대기)하는 동안 제어권을 메시지 루프에 양보 - 일종의 sleep 기능이라고 봐도 된다.
             yield return new WaitForSeconds(0.3f);
+
+            // 몬스터의 상태가 DIE일 때 코루틴 종료
+            if(state == State.DIE) yield break;
 
             // 몬스터와 플레이어 사이의 거리 측정
             float distance = Vector3.Distance(playerTr.position, monsterTr.position);
@@ -94,6 +114,7 @@ public class MonsterCtrl : MonoBehaviour
             }
         }
     }
+
 
     // 몬스터의 상태에 따라 몬스터의 동작을 수행
     IEnumerator MonsterAction()
@@ -130,6 +151,13 @@ public class MonsterCtrl : MonoBehaviour
 
                 // 사망
                 case State.DIE:
+                    isDie = true;
+                    // 추적 정지
+                    agent.isStopped = true;
+                    // 사망 애니메이션 실행
+                    anim.SetTrigger(hashDie);
+                    // 몬스터의 Collider 컴포넌트 비활성화
+                    GetComponent<CapsuleCollider>().enabled = false;
                     break;
             }
             yield return new WaitForSeconds(0.3f);
@@ -152,13 +180,16 @@ public class MonsterCtrl : MonoBehaviour
             Quaternion rot = Quaternion.LookRotation(-collision.GetContact(0).normal);
             // 혈흔 효과를 생성하는 함수 호출
             ShowBloodEffect(pos, rot);
+
+            // 몬스터의 hp 차감
+            hp -= 10;
+            if(hp <= 0)
+            {
+                state = State.DIE;
+            }
         }
     }
 
-    private void OnTriggerEnter(Collider collider)
-    {
-        Debug.Log(collider.gameObject.name);
-    }
     void ShowBloodEffect(Vector3 pos, Quaternion rot)
     {
         // 혈흔 효과 생성
@@ -179,6 +210,7 @@ public class MonsterCtrl : MonoBehaviour
         anim.SetFloat(hashSpeed, UnityEngine.Random.Range(0.8f, 1.2f));
         anim.SetTrigger(hashPlayerDie);
     }
+
 
     // MonsterAction 함수에서 플레이어와 몬스터의 거리에 따라 몬스터의 상태를 설정하게 되는데, 그 상태에 따라 실선으로 추적 사정거리 및 공격 사정거리를 표시하는 함수
     private void OnDrawGizmos()
