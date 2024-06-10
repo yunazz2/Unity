@@ -98,9 +98,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  traceDistance: 10
+  traceDistance: 50
   attackDistance: 2
   isDie: 0
+  hp: 100
 --- !u!136 &827798846725570378
 CapsuleCollider:
   m_ObjectHideFlags: 0
