@@ -71,6 +71,8 @@ public class MonsterCtrl : MonoBehaviour
 
         // NavMeshAgent 컴포넌트 할당
         agent = GetComponent<NavMeshAgent>();
+        // NavMeshAgent의 자동 회전 기능 비활성화
+        agent.updateRotation = false;
 
         // Animator 컴포넌트 할당
         anim = GetComponent<Animator>();
@@ -80,6 +82,19 @@ public class MonsterCtrl : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        // 목적지까지 남은 거리로 회전 여부 판단
+        if (agent.remainingDistance >= 2.0f)
+        {
+            // 에이전트의 이동 방향
+            Vector3 direction = agent.desiredVelocity;
+            // 회전 각도(쿼터니언) 산출
+            Quaternion rot = Quaternion.LookRotation(direction);
+            // 구면 선형보간 함수로 부드러운 회전 처리
+            monsterTr.rotation = Quaternion.Slerp(monsterTr.rotation, rot, Time.deltaTime * 10.0f);
+        }
+    }
 
     // 0.3초마다 플레이어와 몬스터 사이의 거리를 체크하여 몬스터의 상태를 업데이트하는 코루틴 함수
     // - Update() 함수 내에 작성해도 무방하지만, 매 프레임마다 실행하는 것은 성능상 문제가 생길 수 있으므로 코루틴 함수로 처리한다.
@@ -184,25 +199,27 @@ public class MonsterCtrl : MonoBehaviour
         {
             // 충돌한 총알을 삭제
             Destroy(collision.gameObject);
+        }
+    }
 
-            // 피격 리액션 애니메이션 실행
-            anim.SetTrigger(hashHit);
+    // 레이캐스트를 통해 데미지를 입히는 로직
+    public void OnDamage(Vector3 pos, Vector3 normal)
+    {
+        // 피격 리액션 애니메이션 실행
+        anim.SetTrigger(hashHit);
+        
+        Quaternion rot = Quaternion.LookRotation(normal);
 
-            // 총알의 충돌 지점
-            Vector3 pos = collision.GetContact(0).point;
-            // 총알의 충돌 지점의 법선 벡터
-            Quaternion rot = Quaternion.LookRotation(-collision.GetContact(0).normal);
-            // 혈흔 효과를 생성하는 함수 호출
-            ShowBloodEffect(pos, rot);
+        // 혈흔 효과를 생성하는 함수 호출
+        ShowBloodEffect(pos, rot);
 
-            // 몬스터의 hp 차감
-            hp -= 10;
-            if(hp <= 0)
-            {
-                state = State.DIE;
-                // 몬스터가 사망했을 때 50점을 추가
-                GameManager.instance.DisplayScore(50);
-            }
+        // 몬스터의 HP 차감
+        hp -= 30;
+        if (hp <= 0)
+        {
+            state = State.DIE;
+            // 몬스터가 사망했을 때 50점을 추가
+            GameManager.instance.DisplayScore(50);
         }
     }
 
