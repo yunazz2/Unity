@@ -88,7 +88,7 @@ public class FireCtrl : MonoBehaviour
         // Muzzle Flash 활성화
         muzzleFlash.enabled = true;
 
-        // 0.2초동안 대기(정지)하는 동안 메시지 루프로 제어권을 양보
+        // 0.2초 대기(정지)하는 동안 메시지 루프로 제어권을 양보
         yield return new WaitForSeconds(0.2f);
 
         // MuzzleFlash 비활성화

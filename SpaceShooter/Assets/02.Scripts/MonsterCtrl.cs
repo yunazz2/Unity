@@ -178,7 +178,7 @@ public class MonsterCtrl : MonoBehaviour
                     // 일정 시간 대기 후 오브젝트 풀링으로 환원
                     yield return new WaitForSeconds(3.0f);
 
-                    // 사망 후 다시 사용할 떄를 위해 hp 값 초기화
+                    // 사망 후 다시 사용할 때를 위해 hp 값 초기화
                     hp = 100;
                     isDie = false;
 
